@@ -2,6 +2,23 @@ heat_template_version: 2015-04-30
 
 description: A template that deploys devstack on one node
 
+parameters:
+
+  keyname:
+    type: string
+    label: Key name for ssh'ing into the VM
+    description: Key name for ssh'ing into the VM
+
+  image:
+    type: string
+    label: Image to use
+    description: The image to use for this devstack VM
+
+  network-uuid:
+    type: string
+    label: The network UUID
+    description: The network UUID of the private tenant network this VM will be on.
+
 resources:
   devstack_vm:
     type: OS::Nova::Server
@@ -41,6 +58,12 @@ resources:
             RABBIT_PASSWORD=secrete
             SERVICE_PASSWORD=secrete
             SERVICE_TOKEN=a682f596-76f3-11e3-b3b2-e716f9080d50
+            disable_service n-net
+            enable_service q-svc
+            enable_service q-dhcp
+            enable_service q-l3
+            enable_service q-agt
+            enable_service q-meta
             disable_service zookeeper
             #FIXED_RANGE=172.31.1.0/24
             #FLOATING_RANGE=192.168.20.0/25
