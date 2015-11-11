@@ -20,6 +20,15 @@ parameters:
     description: The network UUID of the private tenant network this VM will be on.
 
 resources:
+  wait_condition:
+    type: OS::Heat::WaitCondition
+    properties:
+      handle: {get_resource: wait_handle}
+      timeout: 2000
+  wait_handle:
+    type: OS::Heat::WaitConditionHandle
+
+  
   devstack_vm:
     type: OS::Nova::Server
     properties:
@@ -28,6 +37,7 @@ resources:
       flavor: m1.large
       networks:
         - network: f4d567f8-5ead-46ab-b9e1-389d9115e7fe
+      user_data_format: RAW
       user_data:
         str_replace:
           template: |
@@ -71,6 +81,8 @@ resources:
             end
             chown -R stack:root /home/stack/devstack/
             su stack ./stack.sh
+            $wc_notify --data-binary '{"status": "SUCCESS"}'
              
           params:
             $some_variable: "HELLO WORLD"
+            $wc_notify: { get_attr: ['wait_handle', 'curl_cli'] }
